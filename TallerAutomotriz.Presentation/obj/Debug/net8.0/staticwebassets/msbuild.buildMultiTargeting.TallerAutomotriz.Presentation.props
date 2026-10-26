@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\TallerAutomotriz.Presentation.props" />
-</Project>

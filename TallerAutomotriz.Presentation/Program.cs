@@ -1,4 +1,4 @@
-using TallerAutomotriz.Application.Interfaces;
+﻿using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Application.Services;
 using TallerAutomotriz.Infrastructure;
 using TallerAutomotriz.Infrastructure.Data;
@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Taller Automotriz API",
         Version = "v1",
-        Description = "API para la gesti�n de un taller automotriz",
+        Description = "API para la gestión de un taller automotriz",
         Contact = new OpenApiContact
         {
             Name = "Taller Automotriz",

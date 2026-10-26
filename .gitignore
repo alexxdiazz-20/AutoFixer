@@ -1,0 +1,32 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+
+# NuGet
+*.nupkg
+**/packages/*
+project.lock.json
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Secretos y config local
+appsettings.Local.json
+*.env
+
+# Sistema
+Thumbs.db
+.DS_Store
