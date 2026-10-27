@@ -83,6 +83,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
         context.Database.Migrate();
+        await DbSeeder.SeedAsync(context);
     }
     catch (Exception ex)
     {
