@@ -10,9 +10,10 @@
 <h4>Service Order Information</h4>
 <hr />
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* "All" muestra también los errores de las filas de servicios, que no tienen <span> propio *@
+            <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" name="id" value="@ViewContext.RouteData.Values["id"]" />
             <div class="form-group mb-3">
                 <label asp-for="Description" class="control-label"></label>
@@ -39,6 +40,9 @@
                 <select asp-for="MechanicId" class="form-control" asp-items="ViewBag.Mechanics"></select>
                 <span asp-validation-for="MechanicId" class="text-danger"></span>
             </div>
+
+            <partial name="_ServiceDetailRows" model="Model.Details" />
+
             <div class="form-group mb-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
@@ -51,4 +55,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="~/js/service-order-details.js" asp-append-version="true"></script>
 }

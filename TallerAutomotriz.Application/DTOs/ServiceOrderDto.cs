@@ -26,7 +26,7 @@ namespace TallerAutomotriz.Application.DTOs
         public string Description { get; set; }
         public int VehicleId { get; set; }
         public int MechanicId { get; set; }
-        public List<CreateServiceOrderDetailDto> Details { get; set; }
+        public List<CreateServiceOrderDetailDto> Details { get; set; } = new();
     }
 
     public class UpdateServiceOrderDto
@@ -36,6 +36,7 @@ namespace TallerAutomotriz.Application.DTOs
         public ServiceOrderStatus Status { get; set; }
         public int VehicleId { get; set; }
         public int MechanicId { get; set; }
+        public List<CreateServiceOrderDetailDto> Details { get; set; } = new();
     }
 
     public class ServiceOrderDetailDto
@@ -53,6 +54,7 @@ namespace TallerAutomotriz.Application.DTOs
     {
         public int ServiceId { get; set; }
         public int Quantity { get; set; }
-        public string Notes { get; set; }
+        // Opcional: si viene vacía se guarda como texto vacío (la columna en BD es NOT NULL)
+        public string? Notes { get; set; }
     }
 }

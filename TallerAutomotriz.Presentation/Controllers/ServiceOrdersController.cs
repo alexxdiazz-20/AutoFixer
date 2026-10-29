@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Linq;
 using System.Threading.Tasks;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 
 namespace TallerAutomotriz.Presentation.Controllers
@@ -59,11 +61,19 @@ namespace TallerAutomotriz.Presentation.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _serviceOrderService.CreateAsync(serviceOrderDto);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _serviceOrderService.CreateAsync(serviceOrderDto);
+                    TempData["Success"] = "Orden de servicio creada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (BusinessRuleException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
             }
 
-            await PopulateDropDowns();
+            await PopulateDropDowns(serviceOrderDto.VehicleId, serviceOrderDto.MechanicId);
             return View(serviceOrderDto);
         }
 
@@ -83,7 +93,15 @@ namespace TallerAutomotriz.Presentation.Controllers
                 Description = serviceOrder.Description,
                 Status = serviceOrder.Status,
                 VehicleId = serviceOrder.VehicleId,
-                MechanicId = serviceOrder.MechanicId
+                MechanicId = serviceOrder.MechanicId,
+                Details = serviceOrder.Details
+                    .Select(d => new CreateServiceOrderDetailDto
+                    {
+                        ServiceId = d.ServiceId,
+                        Quantity = d.Quantity,
+                        Notes = d.Notes
+                    })
+                    .ToList()
             };
 
             await PopulateDropDowns(serviceOrder.VehicleId, serviceOrder.MechanicId);
@@ -97,14 +115,22 @@ namespace TallerAutomotriz.Presentation.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updatedServiceOrder = await _serviceOrderService.UpdateAsync(id, serviceOrderDto);
-
-                if (updatedServiceOrder == null)
+                try
                 {
-                    return NotFound();
-                }
+                    var updatedServiceOrder = await _serviceOrderService.UpdateAsync(id, serviceOrderDto);
 
-                return RedirectToAction(nameof(Index));
+                    if (updatedServiceOrder == null)
+                    {
+                        return NotFound();
+                    }
+
+                    TempData["Success"] = "Orden de servicio actualizada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (BusinessRuleException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
             }
 
             await PopulateDropDowns(serviceOrderDto.VehicleId, serviceOrderDto.MechanicId);
@@ -130,6 +156,7 @@ namespace TallerAutomotriz.Presentation.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _serviceOrderService.DeleteAsync(id);
+            TempData["Success"] = "Orden de servicio eliminada correctamente.";
             return RedirectToAction(nameof(Index));
         }
 

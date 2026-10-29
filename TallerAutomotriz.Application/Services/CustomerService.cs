@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Domain.Entities;
 using TallerAutomotriz.Infrastructure.Interfaces;
@@ -65,6 +66,12 @@ namespace TallerAutomotriz.Application.Services
 
             if (customer == null)
                 return false;
+
+            // No se puede borrar un cliente con vehículos registrados
+            var vehicleCount = (await _unitOfWork.VehicleRepository.FindAsync(v => v.CustomerId == id)).Count();
+            if (vehicleCount > 0)
+                throw new BusinessRuleException(
+                    $"No se puede eliminar: el cliente tiene {vehicleCount} {(vehicleCount == 1 ? "vehículo registrado" : "vehículos registrados")}. Elimina o reasigna sus vehículos primero.");
 
             _unitOfWork.CustomerRepository.Remove(customer);
             await _unitOfWork.SaveChangesAsync();

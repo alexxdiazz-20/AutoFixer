@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Domain.Entities;
 using TallerAutomotriz.Infrastructure.Interfaces;
@@ -71,6 +72,12 @@ namespace TallerAutomotriz.Application.Services
 
             if (vehicle == null)
                 return false;
+
+            // No se puede borrar un vehículo con historial de órdenes
+            var orderCount = (await _unitOfWork.ServiceOrderRepository.FindAsync(o => o.VehicleId == id)).Count();
+            if (orderCount > 0)
+                throw new BusinessRuleException(
+                    $"No se puede eliminar: el vehículo tiene {orderCount} {(orderCount == 1 ? "orden de servicio registrada" : "órdenes de servicio registradas")}.");
 
             _unitOfWork.VehicleRepository.Remove(vehicle);
             await _unitOfWork.SaveChangesAsync();

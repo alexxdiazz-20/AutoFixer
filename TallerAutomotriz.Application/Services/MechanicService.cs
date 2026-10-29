@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Domain.Entities;
 using TallerAutomotriz.Infrastructure.Interfaces;
@@ -65,6 +66,12 @@ namespace TallerAutomotriz.Application.Services
 
             if (mechanic == null)
                 return false;
+
+            // No se puede borrar un mecánico con órdenes asignadas
+            var orderCount = (await _unitOfWork.ServiceOrderRepository.FindAsync(o => o.MechanicId == id)).Count();
+            if (orderCount > 0)
+                throw new BusinessRuleException(
+                    $"No se puede eliminar: el mecánico tiene {orderCount} {(orderCount == 1 ? "orden de servicio asignada" : "órdenes de servicio asignadas")}.");
 
             _unitOfWork.MechanicRepository.Remove(mechanic);
             await _unitOfWork.SaveChangesAsync();

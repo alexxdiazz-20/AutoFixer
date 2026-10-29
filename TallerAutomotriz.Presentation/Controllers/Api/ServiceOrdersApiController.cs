@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 
 namespace TallerAutomotriz.Presentation.Controllers.Api
@@ -64,9 +65,15 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var createdServiceOrder = await _serviceOrderService.CreateAsync(serviceOrderDto);
-
-            return CreatedAtAction(nameof(GetServiceOrder), new { id = createdServiceOrder.Id }, createdServiceOrder);
+            try
+            {
+                var createdServiceOrder = await _serviceOrderService.CreateAsync(serviceOrderDto);
+                return CreatedAtAction(nameof(GetServiceOrder), new { id = createdServiceOrder.Id }, createdServiceOrder);
+            }
+            catch (BusinessRuleException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // PUT: api/ServiceOrdersApi/5
@@ -78,14 +85,21 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var updatedServiceOrder = await _serviceOrderService.UpdateAsync(id, serviceOrderDto);
-
-            if (updatedServiceOrder == null)
+            try
             {
-                return NotFound();
-            }
+                var updatedServiceOrder = await _serviceOrderService.UpdateAsync(id, serviceOrderDto);
 
-            return Ok(updatedServiceOrder);
+                if (updatedServiceOrder == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(updatedServiceOrder);
+            }
+            catch (BusinessRuleException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         // DELETE: api/ServiceOrdersApi/5

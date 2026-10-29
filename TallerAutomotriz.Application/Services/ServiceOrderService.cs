@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Domain.Entities;
 using TallerAutomotriz.Infrastructure.Interfaces;
@@ -47,41 +48,20 @@ namespace TallerAutomotriz.Application.Services
 
         public async Task<ServiceOrderDto> CreateAsync(CreateServiceOrderDto serviceOrderDto)
         {
+            // Se valida todo ANTES de crear la orden: si algo falla, no se guarda nada
+            var details = await BuildDetailsAsync(serviceOrderDto.Details);
+
             var serviceOrder = _mapper.Map<ServiceOrder>(serviceOrderDto);
             serviceOrder.CreatedAt = DateTime.UtcNow;
             serviceOrder.Status = ServiceOrderStatus.Pending;
-
-            // Calcular el total
-            decimal totalAmount = 0;
-            var details = new List<ServiceOrderDetail>();
-
-            foreach (var detailDto in serviceOrderDto.Details)
-            {
-                var service = await _unitOfWork.ServiceRepository.GetByIdAsync(detailDto.ServiceId);
-                if (service == null)
-                    continue;
-
-                var detail = new ServiceOrderDetail
-                {
-                    ServiceId = detailDto.ServiceId,
-                    Quantity = detailDto.Quantity,
-                    UnitPrice = service.Price,
-                    Subtotal = service.Price * detailDto.Quantity,
-                    Notes = detailDto.Notes,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                totalAmount += detail.Subtotal;
-                details.Add(detail);
-            }
-
-            serviceOrder.TotalAmount = totalAmount;
             serviceOrder.Details = details;
+            serviceOrder.TotalAmount = details.Sum(d => d.Subtotal);
 
             await _unitOfWork.ServiceOrderRepository.AddAsync(serviceOrder);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ServiceOrderDto>(serviceOrder);
+            // Se recarga para devolver placa, mecánico y nombres de servicios
+            return await GetByIdAsync(serviceOrder.Id);
         }
 
         public async Task<ServiceOrderDto> UpdateAsync(int id, UpdateServiceOrderDto serviceOrderDto)
@@ -91,13 +71,28 @@ namespace TallerAutomotriz.Application.Services
             if (existingServiceOrder == null)
                 return null;
 
+            var newDetails = await BuildDetailsAsync(serviceOrderDto.Details);
+
             _mapper.Map(serviceOrderDto, existingServiceOrder);
             existingServiceOrder.UpdatedAt = DateTime.UtcNow;
 
-            _unitOfWork.ServiceOrderRepository.Update(existingServiceOrder);
+            // Reemplazar los servicios de la orden por los que vienen del formulario
+            foreach (var oldDetail in existingServiceOrder.Details.ToList())
+            {
+                _unitOfWork.ServiceOrderDetailRepository.Remove(oldDetail);
+            }
+            existingServiceOrder.Details.Clear();
+
+            foreach (var detail in newDetails)
+            {
+                existingServiceOrder.Details.Add(detail);
+            }
+            existingServiceOrder.TotalAmount = newDetails.Sum(d => d.Subtotal);
+
+            // La orden ya está siendo rastreada por EF (se cargó arriba), basta con guardar
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ServiceOrderDto>(existingServiceOrder);
+            return await GetByIdAsync(id);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -111,6 +106,39 @@ namespace TallerAutomotriz.Application.Services
             await _unitOfWork.SaveChangesAsync();
 
             return true;
+        }
+
+        /// <summary>
+        /// Valida las líneas de servicio y arma los detalles con el precio real del servicio.
+        /// </summary>
+        private async Task<List<ServiceOrderDetail>> BuildDetailsAsync(List<CreateServiceOrderDetailDto> detailDtos)
+        {
+            if (detailDtos == null || detailDtos.Count == 0)
+                throw new BusinessRuleException("Agrega al menos un servicio a la orden.");
+
+            var details = new List<ServiceOrderDetail>();
+
+            foreach (var detailDto in detailDtos)
+            {
+                if (detailDto.Quantity < 1)
+                    throw new BusinessRuleException("La cantidad de cada servicio debe ser 1 o más.");
+
+                var service = await _unitOfWork.ServiceRepository.GetByIdAsync(detailDto.ServiceId);
+                if (service == null)
+                    throw new BusinessRuleException($"El servicio seleccionado (ID {detailDto.ServiceId}) no existe.");
+
+                details.Add(new ServiceOrderDetail
+                {
+                    ServiceId = service.Id,
+                    Quantity = detailDto.Quantity,
+                    UnitPrice = service.Price,
+                    Subtotal = service.Price * detailDto.Quantity,
+                    Notes = detailDto.Notes?.Trim() ?? string.Empty,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+
+            return details;
         }
     }
 }

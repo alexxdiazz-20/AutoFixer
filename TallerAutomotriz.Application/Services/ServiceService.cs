@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Domain.Entities;
 using TallerAutomotriz.Infrastructure.Interfaces;
@@ -65,6 +66,15 @@ namespace TallerAutomotriz.Application.Services
 
             if (service == null)
                 return false;
+
+            // No se puede borrar un servicio que ya se usó en órdenes
+            var orderCount = (await _unitOfWork.ServiceOrderDetailRepository.FindAsync(d => d.ServiceId == id))
+                .Select(d => d.ServiceOrderId)
+                .Distinct()
+                .Count();
+            if (orderCount > 0)
+                throw new BusinessRuleException(
+                    $"No se puede eliminar: el servicio se usó en {orderCount} {(orderCount == 1 ? "orden de servicio" : "órdenes de servicio")}.");
 
             _unitOfWork.ServiceRepository.Remove(service);
             await _unitOfWork.SaveChangesAsync();
