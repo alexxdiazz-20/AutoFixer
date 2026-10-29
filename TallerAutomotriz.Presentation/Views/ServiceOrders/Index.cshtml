@@ -30,6 +30,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.MechanicFullName)
             </th>
+            <th>Servicios</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -54,6 +55,12 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.MechanicFullName)
+                </td>
+                <td>
+                    <span class="badge bg-secondary">@item.Details.Count</span>
+                    <small class="text-muted">
+                        @string.Join(", ", item.Details.Select(d => d.Quantity > 1 ? $"{d.ServiceName} x{d.Quantity}" : d.ServiceName))
+                    </small>
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> |

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 
 namespace TallerAutomotriz.Presentation.Controllers.Api
@@ -84,14 +85,22 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicle(int id)
         {
-            var result = await _vehicleService.DeleteAsync(id);
-
-            if (!result)
+            try
             {
-                return NotFound();
-            }
+                var result = await _vehicleService.DeleteAsync(id);
 
-            return NoContent();
+                if (!result)
+                {
+                    return NotFound();
+                }
+
+                return NoContent();
+            }
+            catch (BusinessRuleException ex)
+            {
+                // 409: el registro existe pero tiene datos que dependen de él
+                return Conflict(new { error = ex.Message });
+            }
         }
     }
 }

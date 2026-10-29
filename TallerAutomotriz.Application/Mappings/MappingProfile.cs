@@ -38,8 +38,11 @@ namespace TallerAutomotriz.Application.Mappings
                     opt => opt.MapFrom(src => $"{src.Vehicle.Brand} {src.Vehicle.Model}"))
                 .ForMember(dest => dest.MechanicFullName,
                     opt => opt.MapFrom(src => $"{src.Mechanic.Name} {src.Mechanic.LastName}"));
-            CreateMap<CreateServiceOrderDto, ServiceOrder>();
-            CreateMap<UpdateServiceOrderDto, ServiceOrder>();
+            // Los detalles se arman a mano en ServiceOrderService (precio real y total)
+            CreateMap<CreateServiceOrderDto, ServiceOrder>()
+                .ForMember(dest => dest.Details, opt => opt.Ignore());
+            CreateMap<UpdateServiceOrderDto, ServiceOrder>()
+                .ForMember(dest => dest.Details, opt => opt.Ignore());
 
             // Mapeos de ServiceOrderDetail
             CreateMap<ServiceOrderDetail, ServiceOrderDetailDto>()

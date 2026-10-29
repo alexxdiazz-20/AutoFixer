@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
 using TallerAutomotriz.Application.DTOs;
+using TallerAutomotriz.Application.Exceptions;
 using TallerAutomotriz.Application.Interfaces;
 
 namespace TallerAutomotriz.Presentation.Controllers
@@ -52,6 +53,7 @@ namespace TallerAutomotriz.Presentation.Controllers
             if (ModelState.IsValid)
             {
                 await _vehicleService.CreateAsync(vehicleDto);
+                TempData["Success"] = "Vehículo registrado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -98,6 +100,7 @@ namespace TallerAutomotriz.Presentation.Controllers
                     return NotFound();
                 }
 
+                TempData["Success"] = "Vehículo actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -123,8 +126,18 @@ namespace TallerAutomotriz.Presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _vehicleService.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                await _vehicleService.DeleteAsync(id);
+                TempData["Success"] = "Vehículo eliminado correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (BusinessRuleException ex)
+            {
+                // Se queda en la pantalla de eliminar mostrando por qué no se pudo
+                TempData["Error"] = ex.Message;
+                return RedirectToAction(nameof(Delete), new { id });
+            }
         }
 
         private async Task PopulateCustomersDropDown(int? selectedCustomerId = null)
