@@ -1,0 +1,64 @@
+﻿@model List<TallerAutomotriz.Application.DTOs.CreateServiceOrderDetailDto>
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using TallerAutomotriz.Application.DTOs
+@{
+    // Servicios que llena el controlador en PopulateDropDowns()
+    var serviceList = (SelectList)ViewBag.Services;
+    var services = serviceList.Items.Cast<ServiceDto>().ToList();
+
+    // Si no hay filas (orden nueva) se muestra una vacía para empezar
+    var rows = (Model != null && Model.Count > 0)
+        ? Model
+        : new List<CreateServiceOrderDetailDto> { new() { Quantity = 1 } };
+}
+
+<h4>Service Details</h4>
+<div id="service-details">
+    @for (var i = 0; i < rows.Count; i++)
+    {
+        var row = rows[i];
+        <div class="service-detail-item row mb-3">
+            <div class="col-md-4">
+                <label class="control-label">Service</label>
+                <select name="Details[@i].ServiceId" class="form-control service-select">
+                    @foreach (var service in services)
+                    {
+                        var price = service.Price.ToString(CultureInfo.InvariantCulture);
+                        if (service.Id == row.ServiceId)
+                        {
+                            <option value="@service.Id" data-price="@price" selected>@service.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@service.Id" data-price="@price">@service.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Quantity</label>
+                <input name="Details[@i].Quantity" class="form-control service-quantity" type="number" min="1" value="@row.Quantity" />
+            </div>
+            <div class="col-md-3">
+                <label class="control-label">Notes <small class="text-muted">(opcional)</small></label>
+                <input name="Details[@i].Notes" class="form-control" value="@row.Notes" />
+            </div>
+            <div class="col-md-2">
+                <label class="control-label">Subtotal</label>
+                <div class="form-control-plaintext fw-semibold service-subtotal">—</div>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-danger remove-service" title="Quitar servicio">X</button>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+    <button type="button" id="add-service" class="btn btn-info">Add Service</button>
+    <div id="service-summary" class="ms-auto">
+        Servicios: <strong id="service-count">0</strong>
+        &nbsp;·&nbsp; Total estimado: <strong id="service-total">RD$ 0.00</strong>
+    </div>
+</div>
