@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
 using System.Threading.Tasks;
@@ -167,15 +167,23 @@ namespace TallerAutomotriz.Presentation.Controllers
             var services = await _serviceService.GetAllAsync();
 
             ViewBag.Vehicles = new SelectList(
-                vehicles,
+                vehicles.Select(vehicle => new
+                {
+                    vehicle.Id,
+                    Label = $"{vehicle.LicensePlate} - {vehicle.Brand} {vehicle.Model}"
+                }),
                 "Id",
-                "LicensePlate",
+                "Label",
                 selectedVehicleId);
 
             ViewBag.Mechanics = new SelectList(
-                mechanics,
+                mechanics.Select(mechanic => new
+                {
+                    mechanic.Id,
+                    Label = $"{mechanic.Name} {mechanic.LastName}".Trim()
+                }),
                 "Id",
-                "Name",
+                "Label",
                 selectedMechanicId);
 
             ViewBag.Services = new SelectList(

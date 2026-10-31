@@ -1,12 +1,12 @@
-﻿@model TallerAutomotriz.Application.DTOs.CreateMechanicDto
+@model TallerAutomotriz.Application.DTOs.CreateMechanicDto
 
 @{
-    ViewData["Title"] = "Create Mechanic";
+    ViewData["Title"] = "Registrar mecánico";
 }
 
-<h1>Create Mechanic</h1>
+<h1>Registrar mecánico</h1>
 
-<h4>Mechanic Information</h4>
+<h4>Información del mecánico</h4>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -43,8 +43,8 @@
                 <span asp-validation-for="HireDate" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <input type="submit" value="Crear" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
             </div>
         </form>
     </div>
