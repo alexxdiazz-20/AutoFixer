@@ -61,3 +61,15 @@ Las tareas se gestionan en **Jira** (proyecto `AF`). Cada cambio se liga a su is
 - [ ] Probado manualmente (y con prueba unitaria si aplica)
 - [ ] PR revisado y aprobado por otro miembro
 - [ ] Issue movido a **Done** en Jira
+
+## Dashboard de inicio (AF-14)
+
+La página de inicio muestra órdenes pendientes y en progreso de todos los meses, órdenes completadas e ingresos del mes actual, y las cinco órdenes más recientes por fecha de orden (desempate por ID). Se conservan los accesos a los módulos.
+
+Los cálculos están en `DashboardService`, dentro de Application. El mes sigue la fecha local del servidor. Las métricas mensuales usan `CompletionDate`: incluyen el primer instante del mes y excluyen el primer instante del siguiente; una orden completada sin fecha de finalización no se suma al mes.
+
+Para ejecutar las pruebas del dashboard:
+
+```bash
+dotnet test AutoFixer.sln
+```
