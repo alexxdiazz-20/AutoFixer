@@ -1,0 +1,99 @@
+﻿@model IEnumerable<TallerAutomotriz.Application.DTOs.ServiceOrderDto>
+@using TallerAutomotriz.Domain.Entities
+
+@{
+    ViewData["Title"] = "Service Orders";
+    var currentStatus = ViewData["CurrentStatus"] as ServiceOrderStatus?;
+}
+
+<h1>Service Orders</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<form asp-action="Index" method="get" class="mb-3 row gx-2 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Estado</label>
+        <select name="status" class="form-select" asp-items="Html.GetEnumSelectList<ServiceOrderStatus>()">
+            <option value="">-- Todos los estados --</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Desde</label>
+        <input type="date" name="startDate" class="form-control" value="@ViewData["StartDate"]" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Hasta</label>
+        <input type="date" name="endDate" class="form-control" value="@ViewData["EndDate"]" />
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-1">Limpiar Filtros</a>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.OrderDate)</th>
+            <th>@Html.DisplayNameFor(model => model.CompletionDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Status)</th>
+            <th>@Html.DisplayNameFor(model => model.TotalAmount)</th>
+            <th>@Html.DisplayNameFor(model => model.VehicleLicensePlate)</th>
+            <th>@Html.DisplayNameFor(model => model.MechanicFullName)</th>
+            <th>Servicios</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="8" class="text-center">No se encontraron órdenes con esos filtros.</td>
+            </tr>
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.CompletionDate)</td>
+                <td>
+                    @if (item.Status == ServiceOrderStatus.Pending)
+                    {
+                        <span class="badge bg-warning text-dark">Pendiente</span>
+                    }
+                    else if (item.Status == ServiceOrderStatus.InProgress)
+                    {
+                        <span class="badge bg-primary">En Progreso</span>
+                    }
+                    else if (item.Status == ServiceOrderStatus.Completed)
+                    {
+                        <span class="badge bg-success">Completada</span>
+                    }
+                    else if (item.Status == ServiceOrderStatus.Cancelled)
+                    {
+                        <span class="badge bg-danger">Cancelada</span>
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.TotalAmount)</td>
+                <td>@Html.DisplayFor(modelItem => item.VehicleLicensePlate)</td>
+                <td>@Html.DisplayFor(modelItem => item.MechanicFullName)</td>
+                <td>
+                    <span class="badge bg-secondary">@item.Details.Count</span>
+                    <small class="text-muted">
+                        @string.Join(", ", item.Details.Select(d => d.Quantity > 1 ? $"{d.ServiceName} x{d.Quantity}" : d.ServiceName))
+                    </small>
+                </td>
+                <td>
+                    @if (item.Status != ServiceOrderStatus.Completed && item.Status != ServiceOrderStatus.Cancelled)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> <span>|</span>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
