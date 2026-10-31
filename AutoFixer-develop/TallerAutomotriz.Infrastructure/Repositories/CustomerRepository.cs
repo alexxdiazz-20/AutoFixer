@@ -3,7 +3,6 @@ using TallerAutomotriz.Infrastructure.Data;
 using TallerAutomotriz.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TallerAutomotriz.Infrastructure.Repositories
@@ -26,21 +25,6 @@ namespace TallerAutomotriz.Infrastructure.Repositories
             return await _dbSet
                 .Include(c => c.Vehicles)
                 .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Customer>> SearchAsync(string searchTerm)
-        {
-            var query = _dbSet.Include(c => c.Vehicles).AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                searchTerm = searchTerm.Trim().ToLower();
-                query = query.Where(c => 
-                    c.FullName.ToLower().Contains(searchTerm) || 
-                    c.Phone.Contains(searchTerm));
-            }
-
-            return await query.ToListAsync();
         }
     }
 }

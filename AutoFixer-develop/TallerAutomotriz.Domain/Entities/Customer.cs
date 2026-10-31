@@ -16,5 +16,7 @@ namespace TallerAutomotriz.Domain.Entities
 
         // Propiedades de navegación
         public ICollection<Vehicle> Vehicles { get; set; }
+        public object FullName { get; set; }
+
     }
 }
