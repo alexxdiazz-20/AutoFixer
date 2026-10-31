@@ -1,0 +1,151 @@
+﻿@model TallerAutomotriz.Application.DTOs.ServiceOrderDto
+@using TallerAutomotriz.Domain.Entities
+
+@{
+    ViewData["Title"] = "Service Order Details";
+}
+
+<h1>Service Order Details</h1>
+
+<div>
+    <h4>Service Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OrderDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CompletionDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CompletionDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @* Aquí podrías agregar tu badge de color más adelante *@
+            <span class="badge bg-primary">@Html.DisplayFor(model => model.Status)</span>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TotalAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalAmount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleLicensePlate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VehicleLicensePlate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehicleBrandModel)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VehicleBrandModel)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MechanicFullName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MechanicFullName)
+        </dd>
+    </dl>
+
+    <h4>Service Details</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Subtotal</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in Model.Details)
+            {
+                <tr>
+                    <td>@detail.ServiceName</td>
+                    <td>@detail.Quantity</td>
+                    <td>@detail.UnitPrice.ToString("C")</td>
+                    <td>@detail.Subtotal.ToString("C")</td>
+                    <td>@detail.Notes</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4">
+    <!-- BOTONES DE FLUJO DE ESTADO -->
+    
+    @* Si está Pendiente, mostramos Iniciar y Cancelar *@
+    @if (Model.Status == ServiceOrderStatus.Pending)
+    {
+        <button class="btn btn-primary" onclick="changeStatus(@Model.Id, 1)">Iniciar Trabajo</button>
+        <button class="btn btn-danger" onclick="changeStatus(@Model.Id, 3)">Cancelar Orden</button>
+    }
+
+    @* Si está En Progreso, mostramos Completar y Cancelar *@
+    @if (Model.Status == ServiceOrderStatus.InProgress)
+    {
+        <button class="btn btn-success" onclick="changeStatus(@Model.Id, 2)">Completar Orden</button>
+        <button class="btn btn-danger" onclick="changeStatus(@Model.Id, 3)">Cancelar Orden</button>
+    }
+
+    @* Si NO está Completada ni Cancelada, permitimos Editar *@
+    @if (Model.Status != ServiceOrderStatus.Completed && Model.Status != ServiceOrderStatus.Cancelled)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+
+<!-- SCRIPT PARA LLAMAR A LA API -->
+@section Scripts {
+    <script>
+        function changeStatus(orderId, newStatusValue) {
+            // Confirmación opcional
+            if (!confirm('¿Estás seguro de cambiar el estado de esta orden?')) {
+                return;
+            }
+
+            // Hacemos la petición PATCH a nuestra API
+            fetch(`/api/ServiceOrdersApi/${orderId}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                // Enviamos el número entero que corresponde al Enum (0=Pending, 1=InProgress, 2=Completed, 3=Cancelled)
+                body: JSON.stringify(newStatusValue) 
+            })
+            .then(async response => {
+                if (response.ok) {
+                    // Si todo sale bien, recargamos la página para ver los cambios
+                    window.location.reload();
+                } else {
+                    // Si la API devuelve un Error 400 (transición inválida), mostramos el mensaje
+                    const errorData = await response.json();
+                    alert('Error: ' + (errorData.error || 'No se pudo cambiar el estado.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error de conexión.');
+            });
+        }
+    </script>
+}

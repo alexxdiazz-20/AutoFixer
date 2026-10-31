@@ -1,4 +1,4 @@
-﻿@model List<TallerAutomotriz.Application.DTOs.CreateServiceOrderDetailDto>
+@model List<TallerAutomotriz.Application.DTOs.CreateServiceOrderDetailDto>
 @using System.Globalization
 @using Microsoft.AspNetCore.Mvc.Rendering
 @using TallerAutomotriz.Application.DTOs
@@ -13,14 +13,14 @@
         : new List<CreateServiceOrderDetailDto> { new() { Quantity = 1 } };
 }
 
-<h4>Service Details</h4>
+<h4>Detalles de los servicios</h4>
 <div id="service-details">
     @for (var i = 0; i < rows.Count; i++)
     {
         var row = rows[i];
         <div class="service-detail-item row mb-3">
             <div class="col-md-4">
-                <label class="control-label">Service</label>
+                <label class="control-label">Servicio</label>
                 <select name="Details[@i].ServiceId" class="form-control service-select">
                     @foreach (var service in services)
                     {
@@ -37,11 +37,11 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="control-label">Quantity</label>
+                <label class="control-label">Cantidad</label>
                 <input name="Details[@i].Quantity" class="form-control service-quantity" type="number" min="1" value="@row.Quantity" />
             </div>
             <div class="col-md-3">
-                <label class="control-label">Notes <small class="text-muted">(opcional)</small></label>
+                <label class="control-label">Notas <small class="text-muted">(opcional)</small></label>
                 <input name="Details[@i].Notes" class="form-control" value="@row.Notes" />
             </div>
             <div class="col-md-2">
@@ -56,7 +56,7 @@
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-3">
-    <button type="button" id="add-service" class="btn btn-info">Add Service</button>
+    <button type="button" id="add-service" class="btn btn-info">Agregar servicio</button>
     <div id="service-summary" class="ms-auto">
         Servicios: <strong id="service-count">0</strong>
         &nbsp;·&nbsp; Total estimado: <strong id="service-total">RD$ 0.00</strong>

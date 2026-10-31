@@ -1,13 +1,13 @@
-﻿@model TallerAutomotriz.Application.DTOs.UpdateServiceOrderDto
+@model TallerAutomotriz.Application.DTOs.UpdateServiceOrderDto
 @using TallerAutomotriz.Domain.Entities
 
 @{
-    ViewData["Title"] = "Edit Service Order";
+    ViewData["Title"] = "Editar orden de servicio";
 }
 
-<h1>Edit Service Order</h1>
+<h1>Editar orden de servicio</h1>
 
-<h4>Service Order Information</h4>
+<h4>Información de la orden</h4>
 <hr />
 <div class="row">
     <div class="col-md-8">
@@ -22,7 +22,7 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<ServiceOrderStatus>()"></select>
+                <select asp-for="Status" class="form-control" asp-items="SpanishUi.StatusOptions"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -31,12 +31,12 @@
                 <span asp-validation-for="CompletionDate" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="VehicleId" class="control-label">Vehicle</label>
+                <label asp-for="VehicleId" class="control-label">Vehículo</label>
                 <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.Vehicles"></select>
                 <span asp-validation-for="VehicleId" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label asp-for="MechanicId" class="control-label">Mechanic</label>
+                <label asp-for="MechanicId" class="control-label">Mecánico</label>
                 <select asp-for="MechanicId" class="form-control" asp-items="ViewBag.Mechanics"></select>
                 <span asp-validation-for="MechanicId" class="text-danger"></span>
             </div>
@@ -44,8 +44,8 @@
             <partial name="_ServiceDetailRows" model="Model.Details" />
 
             <div class="form-group mb-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
             </div>
         </form>
     </div>

@@ -16,7 +16,7 @@ namespace TallerAutomotriz.Domain.Entities
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public ServiceOrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }

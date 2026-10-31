@@ -19,10 +19,12 @@ namespace TallerAutomotriz.Application.DTOs
 
         public string? Description { get; set; }
 
-        [Range(typeof(decimal), "0.01", "999999999", ErrorMessage = "El precio debe ser mayor que cero.")]
+        [Range(typeof(decimal), "0.01", "999999999",
+            ErrorMessage = "El precio debe ser mayor que cero.")]
         public decimal Price { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "El tiempo estimado debe ser mayor que cero.")]
+        [Range(1, int.MaxValue,
+            ErrorMessage = "El tiempo estimado debe ser mayor que cero.")]
         public int EstimatedTimeInMinutes { get; set; }
     }
 
@@ -34,10 +36,12 @@ namespace TallerAutomotriz.Application.DTOs
 
         public string? Description { get; set; }
 
-        [Range(typeof(decimal), "0.01", "999999999", ErrorMessage = "El precio debe ser mayor que cero.")]
+        [Range(typeof(decimal), "0.01", "999999999",
+            ErrorMessage = "El precio debe ser mayor que cero.")]
         public decimal Price { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "El tiempo estimado debe ser mayor que cero.")]
+        [Range(1, int.MaxValue,
+            ErrorMessage = "El tiempo estimado debe ser mayor que cero.")]
         public int EstimatedTimeInMinutes { get; set; }
     }
 }

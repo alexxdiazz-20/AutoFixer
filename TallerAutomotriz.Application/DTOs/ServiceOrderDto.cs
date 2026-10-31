@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TallerAutomotriz.Domain.Entities;
@@ -53,9 +52,7 @@ namespace TallerAutomotriz.Application.DTOs
     public class UpdateServiceOrderDto
     {
         public DateTime? CompletionDate { get; set; }
-
         public string? Description { get; set; }
-
         public ServiceOrderStatus Status { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un vehículo.")]

@@ -1,0 +1,52 @@
+﻿@model TallerAutomotriz.Application.DTOs.CreateServiceOrderDto
+
+@{
+    ViewData["Title"] = "Create Service Order";
+}
+
+<h1>Create Service Order</h1>
+
+<h4>Service Order Information</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            @* "All" muestra también los errores de las filas de servicios, que no tienen <span> propio *@
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="OrderDate" class="control-label"></label>
+                <input asp-for="OrderDate" class="form-control" type="date" value="@(Model?.OrderDate > DateTime.MinValue ? Model.OrderDate.ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd"))" />
+                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="VehicleId" class="control-label">Vehicle</label>
+                <select asp-for="VehicleId" class="form-control" asp-items="ViewBag.Vehicles"></select>
+                <span asp-validation-for="VehicleId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="MechanicId" class="control-label">Mechanic</label>
+                <select asp-for="MechanicId" class="form-control" asp-items="ViewBag.Mechanics"></select>
+                <span asp-validation-for="MechanicId" class="text-danger"></span>
+            </div>
+
+            <partial name="_ServiceDetailRows" model="Model?.Details" />
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/service-order-details.js" asp-append-version="true"></script>
+}

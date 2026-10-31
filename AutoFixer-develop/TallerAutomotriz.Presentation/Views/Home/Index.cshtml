@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Taller Automotriz</h1>
+    <p>Sistema de gestión para talleres automotrices.</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Clientes</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Gestión de clientes del taller.</p>
+                <a asp-controller="Customers" asp-action="Index" class="btn btn-outline-primary">Ver Clientes</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-car-front"></i> Vehículos</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Gestión de vehículos registrados.</p>
+                <a asp-controller="Vehicles" asp-action="Index" class="btn btn-outline-success">Ver Vehículos</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-tools"></i> Servicios</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Catálogo de servicios ofrecidos.</p>
+                <a asp-controller="Services" asp-action="Index" class="btn btn-outline-info">Ver Servicios</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Órdenes de Servicio</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Gestión de órdenes de trabajo.</p>
+                <a asp-controller="ServiceOrders" asp-action="Index" class="btn btn-outline-warning">Ver Órdenes</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-person-badge"></i> Mecánicos</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Gestión de mecánicos del taller.</p>
+                <a asp-controller="Mechanics" asp-action="Index" class="btn btn-outline-danger">Ver Mecánicos</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,13 +1,13 @@
-﻿@model TallerAutomotriz.Application.DTOs.CustomerDto
+@model TallerAutomotriz.Application.DTOs.CustomerDto
 
 @{
-    ViewData["Title"] = "Customer Details";
+    ViewData["Title"] = "Detalles del cliente";
 }
 
-<h1>Customer Details</h1>
+<h1>Detalles del cliente</h1>
 
 <div>
-    <h4>Customer</h4>
+    <h4>Cliente</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -43,6 +43,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a> |
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar</a> |
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
 </div>

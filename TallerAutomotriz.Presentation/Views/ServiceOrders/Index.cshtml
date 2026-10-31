@@ -1,13 +1,13 @@
-﻿@model IEnumerable<TallerAutomotriz.Application.DTOs.ServiceOrderDto>
+@model IEnumerable<TallerAutomotriz.Application.DTOs.ServiceOrderDto>
 
 @{
-    ViewData["Title"] = "Service Orders";
+    ViewData["Title"] = "Órdenes de servicio";
 }
 
-<h1>Service Orders</h1>
+<h1>Órdenes de servicio</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo</a>
 </p>
 <table class="table">
     <thead>
@@ -31,7 +31,7 @@
                 @Html.DisplayNameFor(model => model.MechanicFullName)
             </th>
             <th>Servicios</th>
-            <th>Actions</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -45,7 +45,7 @@
                     @Html.DisplayFor(modelItem => item.CompletionDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Status)
+                    @SpanishUi.GetStatusName(item.Status)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TotalAmount)
@@ -63,9 +63,9 @@
                     </small>
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
                 </td>
             </tr>
         }

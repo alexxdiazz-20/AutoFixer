@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace TallerAutomotriz.Domain.Entities
@@ -12,14 +11,11 @@ namespace TallerAutomotriz.Domain.Entities
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-
-      
         public string? Address { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        // Propiedades de navegación
         public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
     }
 }

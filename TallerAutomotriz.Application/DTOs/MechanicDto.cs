@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace TallerAutomotriz.Application.DTOs
@@ -7,6 +6,7 @@ namespace TallerAutomotriz.Application.DTOs
     public class MechanicDto
     {
         public int Id { get; set; }
+
         public string Name { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string? Specialization { get; set; }

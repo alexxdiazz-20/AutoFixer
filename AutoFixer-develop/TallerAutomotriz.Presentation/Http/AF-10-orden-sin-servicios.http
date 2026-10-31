@@ -1,0 +1,155 @@
+# ============================================================================
+# AF-10 · Error 500 al crear una orden sin servicios
+#
+# Cómo usarlo:
+#   1. Corre la app con el perfil "https" (▶).
+#   2. Abre este archivo en Visual Studio y dale a "Send request"
+#      encima de cada prueba. La respuesta sale en el panel de la derecha.
+#   3. Los IDs usados (vehicleId 1, mechanicId 1, serviceId 1 y 2) existen
+#      en la base de datos de demo. Si usas tu propia base, cámbialos
+#      con Ctrl+H por IDs que existan en ella.
+#
+# Nota: mientras AF-9 no esté en develop, "notes" y "description" son
+# obligatorios, por eso todas las pruebas los llevan.
+# ============================================================================
+
+
+
+# PRUEBA 1 - Orden válida con 2 servicios
+# Esperado: 201 Created, con totalAmount = suma de (precio x cantidad)
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: orden válida",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": [
+    { "serviceId": 1, "quantity": 1, "notes": "Primera línea" },
+    { "serviceId": 2, "quantity": 2, "notes": "Segunda línea" }
+  ]
+}
+
+
+### PRUEBA 2 - Lista de servicios vacía
+# Esperado: 400 Bad Request
+# { "error": "Agrega al menos un servicio a la orden." }
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: sin servicios",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": []
+}
+
+
+### PRUEBA 3 - Sin la propiedad "details" (antes daba 500)
+# Esperado: 400 Bad Request
+# { "error": "Agrega al menos un servicio a la orden." }
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: sin details",
+  "vehicleId": 1,
+  "mechanicId": 1
+}
+
+
+### PRUEBA 4 - Servicio que no existe
+# Esperado: 400 Bad Request
+# { "error": "El servicio seleccionado (ID 999) no existe." }
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: servicio inexistente",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": [
+    { "serviceId": 999, "quantity": 1, "notes": "No existe" }
+  ]
+}
+
+
+### PRUEBA 5 - Cantidad 0
+# Esperado: 400 Bad Request
+# { "error": "La cantidad de cada servicio debe ser 1 o más." }
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: cantidad cero",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": [
+    { "serviceId": 1, "quantity": 0, "notes": "Cantidad cero" }
+  ]
+}
+
+
+### PRUEBA 6 - Cantidad negativa
+# Esperado: 400 Bad Request
+# { "error": "La cantidad de cada servicio debe ser 1 o más." }
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: cantidad negativa",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": [
+    { "serviceId": 1, "quantity": -3, "notes": "Cantidad negativa" }
+  ]
+}
+
+
+### PRUEBA 7 - Un servicio válido + uno inexistente (no debe guardar NADA)
+# Esperado: 400 Bad Request con el mensaje del ID 999.
+# Después corre la PRUEBA 8 y confirma que NO apareció una orden
+# "Prueba AF-10: mezcla" (antes se guardaba ignorando el inválido).
+POST https://localhost:7213/api/ServiceOrdersApi
+Content-Type: application/json
+
+{
+  "orderDate": "2026-10-28",
+  "description": "Prueba AF-10: mezcla",
+  "vehicleId": 1,
+  "mechanicId": 1,
+  "details": [
+    { "serviceId": 1, "quantity": 1, "notes": "Válido" },
+    { "serviceId": 999, "quantity": 1, "notes": "Inválido" }
+  ]
+}
+
+
+### PRUEBA 8 - Listar órdenes (verificación)
+# Esperado: 200 OK. Debe aparecer la orden de la PRUEBA 1
+# y NINGUNA de las pruebas 2 a 7.
+GET https://localhost:7213/api/ServiceOrdersApi
+
+
+# ============================================================================
+# PRUEBAS MANUALES EN EL NAVEGADOR (Órdenes de servicio → Create New)
+#
+# [ ] A. Quitar TODOS los servicios con la X y darle a Create
+#        → Mensaje rojo arriba: "Agrega al menos un servicio a la orden."
+#        → No se guarda nada.
+#
+# [ ] B. Agregar 2 servicios, borrar el PRIMERO (X) y darle a Create
+#        → Se guarda la orden con 1 servicio (el que quedó).
+#
+# [ ] C. Agregar 3 servicios, borrar el del MEDIO y darle a Create
+#        → Se guarda con los 2 servicios que quedaron.
+#
+# [ ] D. Orden normal con 2 servicios
+#        → Se guarda y el total en el listado es correcto.
+# ============================================================================
