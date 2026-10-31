@@ -1,12 +1,111 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model TallerAutomotriz.Application.DTOs.DashboardDto
+@using TallerAutomotriz.Domain.Entities
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Taller Automotriz</h1>
-    <p>Sistema de gestión para talleres automotrices.</p>
+<div class="mb-4">
+    <h1 class="display-5">Resumen del taller</h1>
+    <p class="text-muted mb-0">Estado de las órdenes e ingresos de @Model.MonthStart.ToString("MMMM yyyy", CultureInfo.GetCultureInfo("es"))</p>
 </div>
 
+<section aria-label="Resumen del negocio" class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-warning">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Órdenes pendientes</h2>
+                <p class="display-6 fw-bold mb-0">@Model.PendingOrders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-primary">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Órdenes en progreso</h2>
+                <p class="display-6 fw-bold mb-0">@Model.InProgressOrders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-success">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Completadas este mes</h2>
+                <p class="display-6 fw-bold mb-0">@Model.CompletedOrdersThisMonth</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card h-100 border-info">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Ingresos del mes</h2>
+                <p class="h2 fw-bold mb-0">@Model.MonthlyRevenue.ToString("N2")</p>
+                <small class="text-muted">Total de órdenes completadas este mes</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="recent-orders-title" class="card mb-4">
+    <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <h2 id="recent-orders-title" class="h5 mb-0">Últimas órdenes</h2>
+        <a asp-controller="ServiceOrders" asp-action="Index" class="btn btn-sm btn-outline-primary">Ver todas las órdenes</a>
+    </div>
+    @if (Model.RecentOrders.Count == 0)
+    {
+        <div class="card-body text-center py-4">
+            <p class="text-muted">Todavía no hay órdenes registradas.</p>
+            <a asp-controller="ServiceOrders" asp-action="Create" class="btn btn-primary">Crear primera orden</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <caption class="visually-hidden">Las cinco órdenes más recientes por fecha de orden.</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Orden</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Vehículo</th>
+                        <th scope="col">Mecánico</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col" class="text-end">Total</th>
+                        <th scope="col">Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.RecentOrders)
+                    {
+                        var (statusLabel, statusClass) = order.Status switch
+                        {
+                            ServiceOrderStatus.Pending => ("Pendiente", "bg-warning text-dark"),
+                            ServiceOrderStatus.InProgress => ("En progreso", "bg-primary"),
+                            ServiceOrderStatus.Completed => ("Completada", "bg-success"),
+                            ServiceOrderStatus.Cancelled => ("Cancelada", "bg-secondary"),
+                            _ => (order.Status.ToString(), "bg-secondary")
+                        };
+                        <tr>
+                            <th scope="row">#@order.Id</th>
+                            <td class="text-nowrap">@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                            <td>@order.VehicleLicensePlate</td>
+                            <td>@order.MechanicFullName</td>
+                            <td><span class="badge @statusClass">@statusLabel</span></td>
+                            <td class="text-end text-nowrap">@order.TotalAmount.ToString("N2")</td>
+                            <td>
+                                <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@order.Id"
+                                   class="btn btn-sm btn-outline-secondary" aria-label="Ver detalle de la orden @order.Id">Ver detalle</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<h2 class="h4">Accesos rápidos</h2>
 <div class="row mt-4">
     <div class="col-md-4 mb-4">
         <div class="card h-100">

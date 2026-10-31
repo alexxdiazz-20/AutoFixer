@@ -1,4 +1,4 @@
-﻿using TallerAutomotriz.Application.Interfaces;
+using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Application.Services;
 using TallerAutomotriz.Infrastructure;
 using TallerAutomotriz.Infrastructure.Data;
@@ -34,6 +34,8 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IMechanicService, MechanicService>();
 builder.Services.AddScoped<IServiceOrderService, ServiceOrderService>();
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Add Swagger
 builder.Services.AddSwaggerGen(c =>
