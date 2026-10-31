@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
@@ -41,6 +42,21 @@ namespace TallerAutomotriz.Application.Services
 
         public async Task<VehicleDto> CreateAsync(CreateVehicleDto vehicleDto)
         {
+            var existingPlate = await _unitOfWork.VehicleRepository.FindAsync(
+                v => v.LicensePlate == vehicleDto.LicensePlate);
+
+            if (existingPlate.Any())
+                throw new BusinessRuleException("Ya existe un vehículo con esa matrícula.");
+
+            if (!string.IsNullOrWhiteSpace(vehicleDto.VIN))
+            {
+                var existingVin = await _unitOfWork.VehicleRepository.FindAsync(
+                    v => v.VIN == vehicleDto.VIN);
+
+                if (existingVin.Any())
+                    throw new BusinessRuleException("Ya existe un vehículo con ese VIN.");
+            }
+
             var vehicle = _mapper.Map<Vehicle>(vehicleDto);
             vehicle.CreatedAt = DateTime.UtcNow;
 
@@ -50,12 +66,27 @@ namespace TallerAutomotriz.Application.Services
             return _mapper.Map<VehicleDto>(vehicle);
         }
 
-        public async Task<VehicleDto> UpdateAsync(int id, UpdateVehicleDto vehicleDto)
+        public async Task<VehicleDto?> UpdateAsync(int id, UpdateVehicleDto vehicleDto)
         {
             var existingVehicle = await _unitOfWork.VehicleRepository.GetByIdAsync(id);
 
             if (existingVehicle == null)
                 return null;
+
+            var existingPlate = await _unitOfWork.VehicleRepository.FindAsync(
+                v => v.LicensePlate == vehicleDto.LicensePlate && v.Id != id);
+
+            if (existingPlate.Any())
+                throw new BusinessRuleException("Ya existe otro vehículo con esa matrícula.");
+
+            if (!string.IsNullOrWhiteSpace(vehicleDto.VIN))
+            {
+                var existingVin = await _unitOfWork.VehicleRepository.FindAsync(
+                    v => v.VIN == vehicleDto.VIN && v.Id != id);
+
+                if (existingVin.Any())
+                    throw new BusinessRuleException("Ya existe otro vehículo con ese VIN.");
+            }
 
             _mapper.Map(vehicleDto, existingVehicle);
             existingVehicle.UpdatedAt = DateTime.UtcNow;
@@ -73,8 +104,9 @@ namespace TallerAutomotriz.Application.Services
             if (vehicle == null)
                 return false;
 
-            // No se puede borrar un vehículo con historial de órdenes
-            var orderCount = (await _unitOfWork.ServiceOrderRepository.FindAsync(o => o.VehicleId == id)).Count();
+            var orderCount = (await _unitOfWork.ServiceOrderRepository
+                .FindAsync(o => o.VehicleId == id)).Count();
+
             if (orderCount > 0)
                 throw new BusinessRuleException(
                     $"No se puede eliminar: el vehículo tiene {orderCount} {(orderCount == 1 ? "orden de servicio registrada" : "órdenes de servicio registradas")}.");

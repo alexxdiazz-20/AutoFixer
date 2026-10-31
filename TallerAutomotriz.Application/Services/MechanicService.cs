@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
@@ -35,6 +36,9 @@ namespace TallerAutomotriz.Application.Services
 
         public async Task<MechanicDto> CreateAsync(CreateMechanicDto mechanicDto)
         {
+            if (mechanicDto.HireDate.Date > DateTime.Today)
+                throw new BusinessRuleException("La fecha de contratación no puede ser futura.");
+
             var mechanic = _mapper.Map<Mechanic>(mechanicDto);
             mechanic.CreatedAt = DateTime.UtcNow;
 
@@ -44,8 +48,11 @@ namespace TallerAutomotriz.Application.Services
             return _mapper.Map<MechanicDto>(mechanic);
         }
 
-        public async Task<MechanicDto> UpdateAsync(int id, UpdateMechanicDto mechanicDto)
+        public async Task<MechanicDto?> UpdateAsync(int id, UpdateMechanicDto mechanicDto)
         {
+            if (mechanicDto.HireDate.Date > DateTime.Today)
+                throw new BusinessRuleException("La fecha de contratación no puede ser futura.");
+
             var existingMechanic = await _unitOfWork.MechanicRepository.GetByIdAsync(id);
 
             if (existingMechanic == null)
@@ -67,8 +74,9 @@ namespace TallerAutomotriz.Application.Services
             if (mechanic == null)
                 return false;
 
-            // No se puede borrar un mecánico con órdenes asignadas
-            var orderCount = (await _unitOfWork.ServiceOrderRepository.FindAsync(o => o.MechanicId == id)).Count();
+            var orderCount = (await _unitOfWork.ServiceOrderRepository
+                .FindAsync(o => o.MechanicId == id)).Count();
+
             if (orderCount > 0)
                 throw new BusinessRuleException(
                     $"No se puede eliminar: el mecánico tiene {orderCount} {(orderCount == 1 ? "orden de servicio asignada" : "órdenes de servicio asignadas")}.");

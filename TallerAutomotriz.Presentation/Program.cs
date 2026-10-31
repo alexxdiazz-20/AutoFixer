@@ -58,7 +58,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         b => b.MigrationsAssembly("TallerAutomotriz.Infrastructure")));
 
 // Register AutoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
 // Register repositories and services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

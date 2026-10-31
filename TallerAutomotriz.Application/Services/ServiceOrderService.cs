@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,7 +49,6 @@ namespace TallerAutomotriz.Application.Services
 
         public async Task<ServiceOrderDto> CreateAsync(CreateServiceOrderDto serviceOrderDto)
         {
-            // Se valida todo ANTES de crear la orden: si algo falla, no se guarda nada
             var details = await BuildDetailsAsync(serviceOrderDto.Details);
 
             var serviceOrder = _mapper.Map<ServiceOrder>(serviceOrderDto);
@@ -60,11 +60,10 @@ namespace TallerAutomotriz.Application.Services
             await _unitOfWork.ServiceOrderRepository.AddAsync(serviceOrder);
             await _unitOfWork.SaveChangesAsync();
 
-            // Se recarga para devolver placa, mecánico y nombres de servicios
             return await GetByIdAsync(serviceOrder.Id);
         }
 
-        public async Task<ServiceOrderDto> UpdateAsync(int id, UpdateServiceOrderDto serviceOrderDto)
+        public async Task<ServiceOrderDto?> UpdateAsync(int id, UpdateServiceOrderDto serviceOrderDto)
         {
             var existingServiceOrder = await _unitOfWork.ServiceOrderRepository.GetByIdAsync(id);
 
@@ -76,20 +75,20 @@ namespace TallerAutomotriz.Application.Services
             _mapper.Map(serviceOrderDto, existingServiceOrder);
             existingServiceOrder.UpdatedAt = DateTime.UtcNow;
 
-            // Reemplazar los servicios de la orden por los que vienen del formulario
             foreach (var oldDetail in existingServiceOrder.Details.ToList())
             {
                 _unitOfWork.ServiceOrderDetailRepository.Remove(oldDetail);
             }
+
             existingServiceOrder.Details.Clear();
 
             foreach (var detail in newDetails)
             {
                 existingServiceOrder.Details.Add(detail);
             }
+
             existingServiceOrder.TotalAmount = newDetails.Sum(d => d.Subtotal);
 
-            // La orden ya está siendo rastreada por EF (se cargó arriba), basta con guardar
             await _unitOfWork.SaveChangesAsync();
 
             return await GetByIdAsync(id);
@@ -108,9 +107,6 @@ namespace TallerAutomotriz.Application.Services
             return true;
         }
 
-        /// <summary>
-        /// Valida las líneas de servicio y arma los detalles con el precio real del servicio.
-        /// </summary>
         private async Task<List<ServiceOrderDetail>> BuildDetailsAsync(List<CreateServiceOrderDetailDto> detailDtos)
         {
             if (detailDtos == null || detailDtos.Count == 0)
@@ -124,6 +120,7 @@ namespace TallerAutomotriz.Application.Services
                     throw new BusinessRuleException("La cantidad de cada servicio debe ser 1 o más.");
 
                 var service = await _unitOfWork.ServiceRepository.GetByIdAsync(detailDto.ServiceId);
+
                 if (service == null)
                     throw new BusinessRuleException($"El servicio seleccionado (ID {detailDto.ServiceId}) no existe.");
 

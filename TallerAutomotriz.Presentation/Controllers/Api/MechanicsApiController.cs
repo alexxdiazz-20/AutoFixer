@@ -18,7 +18,6 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
             _mechanicService = mechanicService;
         }
 
-        // GET: api/MechanicsApi
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MechanicDto>>> GetMechanics()
         {
@@ -26,54 +25,53 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
             return Ok(mechanics);
         }
 
-        // GET: api/MechanicsApi/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MechanicDto>> GetMechanic(int id)
         {
             var mechanic = await _mechanicService.GetByIdAsync(id);
 
             if (mechanic == null)
-            {
                 return NotFound();
-            }
 
             return Ok(mechanic);
         }
 
-        // POST: api/MechanicsApi
         [HttpPost]
         public async Task<ActionResult<MechanicDto>> CreateMechanic(CreateMechanicDto mechanicDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var createdMechanic = await _mechanicService.CreateAsync(mechanicDto);
+
+                return CreatedAtAction(
+                    nameof(GetMechanic),
+                    new { id = createdMechanic.Id },
+                    createdMechanic);
             }
-
-            var createdMechanic = await _mechanicService.CreateAsync(mechanicDto);
-
-            return CreatedAtAction(nameof(GetMechanic), new { id = createdMechanic.Id }, createdMechanic);
+            catch (BusinessRuleException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
-        // PUT: api/MechanicsApi/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMechanic(int id, UpdateMechanicDto mechanicDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                var updatedMechanic = await _mechanicService.UpdateAsync(id, mechanicDto);
+
+                if (updatedMechanic == null)
+                    return NotFound();
+
+                return Ok(updatedMechanic);
             }
-
-            var updatedMechanic = await _mechanicService.UpdateAsync(id, mechanicDto);
-
-            if (updatedMechanic == null)
+            catch (BusinessRuleException ex)
             {
-                return NotFound();
+                return BadRequest(new { error = ex.Message });
             }
-
-            return Ok(updatedMechanic);
         }
 
-        // DELETE: api/MechanicsApi/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMechanic(int id)
         {
@@ -82,15 +80,12 @@ namespace TallerAutomotriz.Presentation.Controllers.Api
                 var result = await _mechanicService.DeleteAsync(id);
 
                 if (!result)
-                {
                     return NotFound();
-                }
 
                 return NoContent();
             }
             catch (BusinessRuleException ex)
             {
-                // 409: el registro existe pero tiene datos que dependen de él
                 return Conflict(new { error = ex.Message });
             }
         }

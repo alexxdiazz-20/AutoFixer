@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
@@ -44,7 +45,7 @@ namespace TallerAutomotriz.Application.Services
             return _mapper.Map<CustomerDto>(customer);
         }
 
-        public async Task<CustomerDto> UpdateAsync(int id, UpdateCustomerDto customerDto)
+        public async Task<CustomerDto?> UpdateAsync(int id, UpdateCustomerDto customerDto)
         {
             var existingCustomer = await _unitOfWork.CustomerRepository.GetByIdAsync(id);
 
@@ -68,7 +69,9 @@ namespace TallerAutomotriz.Application.Services
                 return false;
 
             // No se puede borrar un cliente con vehículos registrados
-            var vehicleCount = (await _unitOfWork.VehicleRepository.FindAsync(v => v.CustomerId == id)).Count();
+            var vehicleCount = (await _unitOfWork.VehicleRepository
+                .FindAsync(v => v.CustomerId == id)).Count();
+
             if (vehicleCount > 0)
                 throw new BusinessRuleException(
                     $"No se puede eliminar: el cliente tiene {vehicleCount} {(vehicleCount == 1 ? "vehículo registrado" : "vehículos registrados")}. Elimina o reasigna sus vehículos primero.");

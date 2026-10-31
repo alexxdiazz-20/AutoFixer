@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using TallerAutomotriz.Application.DTOs;
@@ -44,7 +45,7 @@ namespace TallerAutomotriz.Application.Services
             return _mapper.Map<ServiceDto>(service);
         }
 
-        public async Task<ServiceDto> UpdateAsync(int id, UpdateServiceDto serviceDto)
+        public async Task<ServiceDto?> UpdateAsync(int id, UpdateServiceDto serviceDto)
         {
             var existingService = await _unitOfWork.ServiceRepository.GetByIdAsync(id);
 
@@ -68,10 +69,12 @@ namespace TallerAutomotriz.Application.Services
                 return false;
 
             // No se puede borrar un servicio que ya se usó en órdenes
-            var orderCount = (await _unitOfWork.ServiceOrderDetailRepository.FindAsync(d => d.ServiceId == id))
+            var orderCount = (await _unitOfWork.ServiceOrderDetailRepository
+                .FindAsync(d => d.ServiceId == id))
                 .Select(d => d.ServiceOrderId)
                 .Distinct()
                 .Count();
+
             if (orderCount > 0)
                 throw new BusinessRuleException(
                     $"No se puede eliminar: el servicio se usó en {orderCount} {(orderCount == 1 ? "orden de servicio" : "órdenes de servicio")}.");
