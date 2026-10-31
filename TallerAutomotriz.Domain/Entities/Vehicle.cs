@@ -10,8 +10,8 @@ namespace TallerAutomotriz.Domain.Entities
         public string Brand { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
-        public string Color { get; set; }
-        public string VIN { get; set; }
+        public string? Color { get; set; }
+        public string? VIN { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

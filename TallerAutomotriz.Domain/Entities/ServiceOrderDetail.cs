@@ -8,7 +8,7 @@ namespace TallerAutomotriz.Domain.Entities
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Subtotal { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 

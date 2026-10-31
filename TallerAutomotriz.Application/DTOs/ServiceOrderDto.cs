@@ -9,7 +9,7 @@ namespace TallerAutomotriz.Application.DTOs
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public ServiceOrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
         public int VehicleId { get; set; }
@@ -23,7 +23,7 @@ namespace TallerAutomotriz.Application.DTOs
     public class CreateServiceOrderDto
     {
         public DateTime OrderDate { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int VehicleId { get; set; }
         public int MechanicId { get; set; }
         public List<CreateServiceOrderDetailDto> Details { get; set; } = new();
@@ -32,7 +32,7 @@ namespace TallerAutomotriz.Application.DTOs
     public class UpdateServiceOrderDto
     {
         public DateTime? CompletionDate { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public ServiceOrderStatus Status { get; set; }
         public int VehicleId { get; set; }
         public int MechanicId { get; set; }
@@ -43,7 +43,7 @@ namespace TallerAutomotriz.Application.DTOs
     {
         public int Id { get; set; }
         public int ServiceId { get; set; }
-        public string ServiceName { get; set; }
+        public string? ServiceName { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal Subtotal { get; set; }
