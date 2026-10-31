@@ -1,4 +1,4 @@
-﻿// Filas de servicios en Crear/Editar orden de servicio.
+// Filas de servicios en Crear/Editar orden de servicio.
 // - Clona la primera fila (ya trae las opciones del select desde el servidor)
 // - Renumera Details[0], Details[1]... para que ASP.NET reciba todas las filas
 // - Muestra subtotal por fila, cantidad de servicios y total estimado
@@ -7,7 +7,8 @@ $(function () {
     if ($container.length === 0) return;
 
     const $template = $container.find(".service-detail-item").first().clone();
-    const money = new Intl.NumberFormat("es-DO", { style: "currency", currency: "DOP" });
+    const money = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatMoney = value => "RD$ " + money.format(value);
 
     function reindex() {
         $container.find(".service-detail-item").each(function (i) {
@@ -25,10 +26,10 @@ $(function () {
             const quantity = parseInt($(this).find(".service-quantity").val(), 10) || 0;
             const subtotal = price * quantity;
             total += subtotal;
-            $(this).find(".service-subtotal").text(money.format(subtotal));
+            $(this).find(".service-subtotal").text(formatMoney(subtotal));
         });
         $("#service-count").text($rows.length);
-        $("#service-total").text(money.format(total));
+        $("#service-total").text(formatMoney(total));
     }
 
     $("#add-service").on("click", function () {

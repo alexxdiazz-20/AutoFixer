@@ -1,3 +1,6 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using TallerAutomotriz.Presentation.Localization;
 using TallerAutomotriz.Application.Interfaces;
 using TallerAutomotriz.Application.Services;
 using TallerAutomotriz.Infrastructure;
@@ -12,7 +15,37 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.ModelMetadataDetailsProviders.Add(new SpanishMetadataProvider());
+    var messages = options.ModelBindingMessageProvider;
+    messages.SetValueMustNotBeNullAccessor(_ => "Este campo es obligatorio.");
+    messages.SetValueMustBeANumberAccessor(name => $"El campo {name} debe ser un número.");
+    messages.SetAttemptedValueIsInvalidAccessor((value, name) => $"El valor '{value}' no es válido para {name}.");
+    messages.SetUnknownValueIsInvalidAccessor(name => $"El valor no es válido para {name}.");
+    messages.SetValueIsInvalidAccessor(value => $"El valor '{value}' no es válido.");
+    messages.SetNonPropertyValueMustBeANumberAccessor(() => "Introduce un número válido.");
+    messages.SetNonPropertyAttemptedValueIsInvalidAccessor(value => $"El valor '{value}' no es válido.");
+    messages.SetNonPropertyUnknownValueIsInvalidAccessor(() => "El valor no es válido.");
+});
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var culture = new CultureInfo("es-DO", useUserOverride: false);
+    culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+    culture.NumberFormat.NumberDecimalSeparator = ".";
+    culture.NumberFormat.NumberGroupSeparator = ",";
+    culture.NumberFormat.CurrencySymbol = "RD$";
+    culture.NumberFormat.CurrencyDecimalSeparator = ".";
+    culture.NumberFormat.CurrencyGroupSeparator = ",";
+    culture.NumberFormat.CurrencyPositivePattern = 2;
+    culture.NumberFormat.CurrencyNegativePattern = 12;
+    options.DefaultRequestCulture = new RequestCulture(culture);
+    options.SupportedCultures = new[] { culture };
+    options.SupportedUICultures = new[] { culture };
+    options.RequestCultureProviders.Clear();
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
 
 
 
@@ -69,6 +102,7 @@ else
     app.UseHsts();
 }
 
+app.UseRequestLocalization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

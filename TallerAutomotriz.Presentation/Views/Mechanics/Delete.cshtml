@@ -1,14 +1,14 @@
-﻿@model TallerAutomotriz.Application.DTOs.MechanicDto
+@model TallerAutomotriz.Application.DTOs.MechanicDto
 
 @{
-    ViewData["Title"] = "Delete Mechanic";
+    ViewData["Title"] = "Eliminar mecánico";
 }
 
-<h1>Delete Mechanic</h1>
+<h1>Eliminar mecánico</h1>
 
-<h3>Are you sure you want to delete this mechanic?</h3>
+<h3>¿Seguro que deseas eliminar este mecánico?</h3>
 <div>
-    <h4>Mechanic Information</h4>
+    <h4>Información del mecánico</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -51,7 +51,7 @@
 
     <form asp-action="Delete">
         <input type="hidden" name="id" value="@Model.Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
     </form>
 </div>

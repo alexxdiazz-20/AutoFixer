@@ -3,7 +3,7 @@
 @using System.Globalization
 
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Inicio";
 }
 
 <div class="mb-4">
@@ -40,7 +40,7 @@
         <div class="card h-100 border-info">
             <div class="card-body">
                 <h2 class="h6 text-muted">Ingresos del mes</h2>
-                <p class="h2 fw-bold mb-0">@Model.MonthlyRevenue.ToString("N2")</p>
+                <p class="h2 fw-bold mb-0">@Model.MonthlyRevenue.ToString("C2")</p>
                 <small class="text-muted">Total de órdenes completadas este mes</small>
             </div>
         </div>
@@ -92,7 +92,7 @@
                             <td>@order.VehicleLicensePlate</td>
                             <td>@order.MechanicFullName</td>
                             <td><span class="badge @statusClass">@statusLabel</span></td>
-                            <td class="text-end text-nowrap">@order.TotalAmount.ToString("N2")</td>
+                            <td class="text-end text-nowrap">@order.TotalAmount.ToString("C2")</td>
                             <td>
                                 <a asp-controller="ServiceOrders" asp-action="Details" asp-route-id="@order.Id"
                                    class="btn btn-sm btn-outline-secondary" aria-label="Ver detalle de la orden @order.Id">Ver detalle</a>
