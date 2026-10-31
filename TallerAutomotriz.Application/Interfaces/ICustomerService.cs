@@ -9,7 +9,7 @@ namespace TallerAutomotriz.Application.Interfaces
         Task<IEnumerable<CustomerDto>> GetAllAsync();
         Task<CustomerDto> GetByIdAsync(int id);
         Task<CustomerDto> CreateAsync(CreateCustomerDto customerDto);
-        Task<CustomerDto> UpdateAsync(int id, UpdateCustomerDto customerDto);
+        Task<CustomerDto?> UpdateAsync(int id, UpdateCustomerDto customerDto);
         Task<bool> DeleteAsync(int id);
     }
 }

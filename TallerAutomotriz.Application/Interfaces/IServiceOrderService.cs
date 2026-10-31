@@ -11,7 +11,7 @@ namespace TallerAutomotriz.Application.Interfaces
         Task<IEnumerable<ServiceOrderDto>> GetByVehicleIdAsync(int vehicleId);
         Task<IEnumerable<ServiceOrderDto>> GetByMechanicIdAsync(int mechanicId);
         Task<ServiceOrderDto> CreateAsync(CreateServiceOrderDto serviceOrderDto);
-        Task<ServiceOrderDto> UpdateAsync(int id, UpdateServiceOrderDto serviceOrderDto);
+        Task<ServiceOrderDto?> UpdateAsync(int id, UpdateServiceOrderDto serviceOrderDto);
         Task<bool> DeleteAsync(int id);
     }
 }
